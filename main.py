@@ -1,6 +1,5 @@
 import pygame
 import sys
-import os
 
 from classes.Player import Player
 from classes.Platform import Platform
@@ -23,7 +22,7 @@ WHITE = (255, 255, 255)
 # Initialize Pygame
 pygame.init()
 surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-pygame.display.set_caption("Pluto's Pursuit")
+pygame.display.set_caption("Pluto")
 clock = pygame.time.Clock()
 
 # Initialize Font
@@ -34,30 +33,29 @@ game_font = pygame.font.SysFont(FONT_FAMILY, font_size, bold = True)
 
 # Load images
 load = pygame.image.load
-backgroundPath = "images/background"
-characterPath = "images/character"
-platformPath = "images/platforms"
-enemyPath = "images/enemy"
-powerupPath = "images/powerups"
+backgroundPath = "static/images/background"
+characterPath = "static/images/character"
+platformPath = "static/images/platforms"
+enemyPath = "static/images/enemy"
+powerupPath = "static/images/powerups"
 
-background_image = load(f"{backgroundPath}/space.png")
+background_image = load(f"{backgroundPath}/space.jpg")
 cloud_image = load(f"{backgroundPath}/clouds.png")
-satellite_image = load(f"{characterPath}/plutos_satalite.png")
 playerImages = {
     "right": [load(f"{characterPath}/R1Pluto.png"), load(f"{characterPath}/R2Pluto.png"), load(f"{characterPath}/R3Pluto.png"), load(f"{characterPath}/R4Pluto.png")],
     "left": [load(f"{characterPath}/L1Pluto.png"), load(f"{characterPath}/L2Pluto.png"), load(f"{characterPath}/L3Pluto.png"), load(f"{characterPath}/L4Pluto.png")],
     "idle": [load(f"{characterPath}/I1Pluto.png"), load(f"{characterPath}/I2Pluto.png"), load(f"{characterPath}/I3Pluto.png"), load(f"{characterPath}/I4Pluto.png")],
 }
-platformImage = load(f"{platformPath}/platform1.png")
+platformImage = load(f"{platformPath}/platform.png")
 enemyImages = {
-    'left': load(f"{enemyPath}/SpacemiteL.png"),
-    'right': load(f"{enemyPath}/SpacemiteR.png"),
-    'idle': load(f"{enemyPath}/Space_Slime.png"),
+    'left': load(f"{enemyPath}/enemyL.png"),
+    'right': load(f"{enemyPath}/enemyR.png"),
+    'idle': load(f"{enemyPath}/spike.png"),
 }
 powerupImages = {
-    'invincibility': load(f"{powerupPath}/powerup1.png"),
-    'double_points': load(f"{powerupPath}/powerup2.png"),
-    'score_boost': load(f"{powerupPath}/powerup3.png"),
+    'invincibility': load(f"{powerupPath}/invincibility.png"),
+    'double_points': load(f"{powerupPath}/2x.png"),
+    'score_boost': load(f"{powerupPath}/add.png"),
 }
 
 # Database instance
@@ -99,8 +97,7 @@ POWERUPS = []
 running = True
 
 # Play music
-s='sounds'
-music=pygame.mixer.music.load(os.path.join(s,'music.mp3'))
+pygame.mixer.music.load('static/audio/music.ogg')
 pygame.mixer.music.play(-1)
 
 # Function with game's main logic
@@ -135,21 +132,22 @@ def main():
             pluto.move(-pluto.speed)
 
             pluto.current_direction = "left"
-            pluto.current_sprites = pluto.sprites_left # Make the current sprite list left
+            pluto.current_sprites = pluto.sprites_left
 
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             pluto.move(pluto.speed)
 
             pluto.current_direction = "right"
-            pluto.current_sprites = pluto.sprites_right # Make the current sprite list right
+            pluto.current_sprites = pluto.sprites_right
 
         else:
             pluto.current_direction = "idle"
-            pluto.current_sprites = pluto.sprites_idle # Fall back to idle sprite list unless keys are being pressed
+            pluto.current_sprites = pluto.sprites_idle
 
         if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
             pluto.jump()
 
+        if keys[pygame.K_m]: pygame.mixer.music.fadeout(500)
 
         # Draw background
         updateBackgroundYPosition()
@@ -157,29 +155,22 @@ def main():
 
         # Draw clouds if needed
         if (pluto.camera_y_offset < WINDOW_HEIGHT):
-            CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 50) + pluto.camera_y_offset)
+            CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 10) + pluto.camera_y_offset)
             surface.blit(cloud_image, CLOUDS_POSITION)
         
         # Draw pluto's satellite
-        SATELLITE_POSITION = (pluto.x - PLUTO_PERSONAL_SPACE, pluto.y - PLUTO_PERSONAL_SPACE + pluto.camera_y_offset)
-        surface.blit(satellite_image, SATELLITE_POSITION)
+        SATELLITE_RADIUS = 10
+        SATELLITE_COLOR = (min(DYNAMIC["score"] * 255 / 200, 255), max(255 - DYNAMIC["score"] * 255 / 200, 0), 0) # (Red, Green, Blue) - 255: Max Intensity - 200: Score satellite is totally red
+        SATELLITE_COLOR = (
+            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
+            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
+            0, # Blue value
+        )
+        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
             
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
         pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
-
-        # Draw platforms
-        for platform in PLATFORMS:
-            surface.blit(platform.platform_sprite, platform.sprite_rect)
-            platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
-
-            # Update Platform instance every frame
-            platform.tick(pluto)
-
-            # Increase score if the platform is touched for the first time
-            if platform.touched and not platform.hasChangedScore:
-                DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
-                platform.hasChangedScore = True
 
         # Draw enemies
         for enemy in ENEMIES:
@@ -212,12 +203,24 @@ def main():
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
 
+        # Draw platforms
+        for platform in PLATFORMS:
+            surface.blit(platform.platform_sprite, platform.sprite_rect)
+            platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
+
+            # Update Platform instance every frame
+            platform.tick(pluto)
+
+            # Increase score if the platform is touched for the first time
+            if platform.touched and not platform.hasChangedScore:
+                DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
+                platform.hasChangedScore = True
 
         # Draw active power-up's visual effect
         if DYNAMIC["invincibility"]["active"]:
             # Draw a force field around Pluto
-            animateCircleInAndOut(surface, RGB_color = (0, 0, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
-                               max_alpha = 40, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            animateCircleInAndOut(surface, RGB_color = (60, 60, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
+                               max_alpha = 50, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
             
         if DYNAMIC["score_boost"]["active"]:
             # Draw "+5" next to Pluto
@@ -227,7 +230,7 @@ def main():
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "dodgerblue2",
+            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "chartreuse",
                              center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 5,
                              time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
 
@@ -322,6 +325,7 @@ def playerFell():
         return False
 
 
+# Function to update the background position as player ascends
 def updateBackgroundYPosition():
     # Calculate the maximum offset the background can move vertically
     max_offset = -(background_image.get_rect().height - WINDOW_HEIGHT)
@@ -356,7 +360,7 @@ def updateBackgroundYPosition():
         DYNAMIC["target_background_y_position"] = None
 
         # Normalize the camera offset to a scale that makes the background movement smoother
-        normalized_camera_offset = pluto.camera_y_offset / (40 * WINDOW_HEIGHT) # 40 is an arbitrary number, the background stops moving at a score of ~200
+        normalized_camera_offset = pluto.camera_y_offset / (35 * WINDOW_HEIGHT) # 35 is an arbitrary number, the background stops moving at a score of ~200
 
         # Ensure the normalized value stays within the range 0 to 1
         clamped_value = max(0, min(1, normalized_camera_offset))

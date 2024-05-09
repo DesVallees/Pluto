@@ -13,11 +13,6 @@ JUMPING_STRENGTH = 50
 
 CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will place pluto when moving
 
-# Load sounds
-pygame.mixer.init()
-jump_sound = pygame.mixer.Sound('sounds/jumpSound.wav')
-ouch = pygame.mixer.Sound('sounds/playerDamage.aiff')
-
 class Player:
     # Constructor for Player class
     def __init__(self, sprites):
@@ -87,10 +82,6 @@ class Player:
 
     # Method to handle jump animation
     def jump(self, overrideSurfaceCondition = False):
-        if self.is_on_surface:
-            # Play jumping sound
-            jump_sound.play()
-
         if self.is_on_surface or overrideSurfaceCondition:
             # Update player's state
             self.is_on_surface = False
@@ -194,9 +185,6 @@ class Player:
     def die(self):
         if self.is_alive:
             self.is_alive = False
-
-            # Play dying sound
-            ouch.play()
 
             # Player does a tiny jump before falling
             self.current_jumping_strength = 15

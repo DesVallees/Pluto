@@ -32,7 +32,7 @@ class Enemy:
         # Enemy's initial coordinates
         self.min_x_value = possibleXValues[0]
         self.max_x_value = possibleXValues[1] - self.width
-        self.x = random.randint(self.min_x_value, self.max_x_value)
+        self.x = random.randint(self.min_x_value + 10, self.max_x_value)
         self.y = y - self.height  # Adjust y to ensure it's shown on top of the surface it was placed on
 
         # Initialize enemy's hitbox
