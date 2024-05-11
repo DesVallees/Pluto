@@ -323,7 +323,7 @@ def playerFell():
     game_over_rect = pygame.Rect(-WINDOW_WIDTH, GAME_OVER_Y_POSITION, WINDOW_WIDTH * 3, 1)
 
     # Return True if pluto touches the trigger 
-    return True if pluto.hitbox.colliderect(game_over_rect) else False
+    return pluto.hitbox.colliderect(game_over_rect)
 
 
 # Function to move the background as the player ascends
