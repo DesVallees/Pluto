@@ -1,17 +1,17 @@
 import pygame
 
-# Color RGB codes
+# Default colors
 BLUE = (30, 30, 255)
 LIGHT_BLUE = (70, 70, 255)
 WHITE = (255, 255, 255)
 
-# Initialize default font
+# Default font
 pygame.font.init()
 button_font = pygame.font.SysFont("calibri, helvetica, arial", 25, bold = True)
 
 class Button:
     # Constructor for Button class
-    def __init__(self, text, x, y, callback, shortcutKeys=[], width=200, height=50, font=button_font, color=WHITE, backgroundColor=LIGHT_BLUE, hoverColor=BLUE, borderRadius=7):
+    def __init__(self, text, x, y, callback, shortcutKeys=[], width=200, height=50, borderRadius=7, font=button_font, color=WHITE, backgroundColor=LIGHT_BLUE, hoverColor=BLUE):
         self.text = text
         self.x = x
         self.y = y
@@ -48,6 +48,7 @@ class Button:
         if self.hovered and not mouseIsHovering:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             self.hovered = False
+
         elif not self.hovered and mouseIsHovering:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             self.hovered = True

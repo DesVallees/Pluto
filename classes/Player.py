@@ -1,6 +1,6 @@
 import pygame
 
-# Named variables
+# Constants
 SCREEN_BOTTOM = 710
 SCREEN_LEFT = -40
 SCREEN_RIGHT = 390
@@ -22,7 +22,7 @@ class Player:
         self.x = STARTING_X_POSITION
         self.y = SCREEN_BOTTOM
 
-        # Camera control - updates when getting on platform
+        # Camera control - updates when landing on platform
         self.camera_y_offset = 0
         self.target_camera_y_offset = 0
         
@@ -61,10 +61,7 @@ class Player:
         self.animatePlayerImage()
         self.animateCameraMovement()
 
-        if self.is_jumping:
-            self.jump(overrideSurfaceCondition=True)
-        else:
-            self.fall(platforms)
+        self.jump(overrideSurfaceCondition=True) if self.is_jumping else self.fall(platforms)
 
     # Method to manage player's x position
     def move(self, pixels):
@@ -112,7 +109,7 @@ class Player:
                 player_is_on_platform = True
                 platformYPosition = platform.y - self.height + 2 # Add 2 pixels to avoid character jounce glitch
 
-                # Set platform's touched attribute to true
+                # Set platform's touched attribute to True
                 platform.touched = True
 
                 # Adjust camera
@@ -128,13 +125,16 @@ class Player:
         isOnPlatform, platformYPosition = self.isOnPlatform(platforms)
         
         if self.y < SCREEN_BOTTOM and not isOnPlatform or not self.is_alive:
+            # Update player's state
             self.is_on_surface = False
             self.is_falling = True
 
+            # Accelerate falling speed
             self.current_falling_speed *= GRAVITY_ACCELERATION
             self.y += min(self.current_falling_speed, MAXIMUM_FALLING_SPEED)
 
         else: 
+            # Update player's state
             self.is_on_surface = True
             self.is_falling = False
 
@@ -181,7 +181,7 @@ class Player:
             # Ensure the camera does not go below 0
             self.camera_y_offset = max(self.camera_y_offset, 0)
 
-    # Method that makes player fall through platforms
+    # Method that makes the player fall through platforms
     def die(self):
         if self.is_alive:
             self.is_alive = False

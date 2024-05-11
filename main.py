@@ -10,7 +10,7 @@ from classes.Button import Button
 
 from animations.animateInAndOut import *
 
-# Named variables
+# Constants
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
 FRAME_RATE = 45
@@ -93,12 +93,12 @@ PLATFORMS = []
 ENEMIES = []
 POWERUPS = []
 
-# Flag to control game state
-running = True
-
 # Play music
 pygame.mixer.music.load('static/audio/music.ogg')
 pygame.mixer.music.play(-1)
+
+# Flag to control game state
+running = True
 
 # Function with game's main logic
 def main():
@@ -111,6 +111,10 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 exitGame()
+
+            # Mute or unmute the music when pressing 'm'
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
 
         # Manage game objects
         createObjects()
@@ -147,7 +151,6 @@ def main():
         if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
             pluto.jump()
 
-        if keys[pygame.K_m]: pygame.mixer.music.fadeout(500)
 
         # Draw background
         updateBackgroundYPosition()
@@ -160,7 +163,6 @@ def main():
         
         # Draw pluto's satellite
         SATELLITE_RADIUS = 10
-        SATELLITE_COLOR = (min(DYNAMIC["score"] * 255 / 200, 255), max(255 - DYNAMIC["score"] * 255 / 200, 0), 0) # (Red, Green, Blue) - 255: Max Intensity - 200: Score satellite is totally red
         SATELLITE_COLOR = (
             min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
             max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
@@ -219,20 +221,20 @@ def main():
         # Draw active power-up's visual effect
         if DYNAMIC["invincibility"]["active"]:
             # Draw a force field around Pluto
-            animateCircleInAndOut(surface, RGB_color = (60, 60, 255), center = pluto.sprite_rect.center, initial_radius = 0, max_radius = pluto.height, 
-                               max_alpha = 50, total_duration = 3, time_left = DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            animateCircleInAndOut(surface, colorRGB=(60, 60, 255), center=pluto.sprite_rect.center, initialRadius=0, maxRadius=pluto.height, 
+                               maxAlpha=50, totalDuration=3, timeLeft=DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animationDuration=0.2)
             
         if DYNAMIC["score_boost"]["active"]:
             # Draw "+5" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "+5", initial_size = 0, max_size = 30, color = "green",
-                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 0.8,
-                             time_left = DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animation_duration = 0.2)
+            animateTextInAndOut(surface, game_font, text="+5", initialSize=0, maxSize=30, color="green",
+                             center=(pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), totalDuration=0.8,
+                             timeLeft=DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animationDuration=0.2)
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
-            animateTextInAndOut(surface, game_font, text = "2x", initial_size = 0, max_size = 30, color = "chartreuse",
-                             center = (pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), total_duration = 5,
-                             time_left = DYNAMIC["double_points"]["timer"] / FRAME_RATE, animation_duration = 0.3)
+            animateTextInAndOut(surface, game_font, text = "2x", initialSize=0, maxSize=30, color="chartreuse",
+                             center=(pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), totalDuration=5,
+                             timeLeft=DYNAMIC["double_points"]["timer"] / FRAME_RATE, animationDuration=0.3)
 
 
         # Display current score
@@ -302,12 +304,13 @@ def removeOffScreenObjects():
     ENEMIES = [enemy for enemy in ENEMIES if enemy.y < CAMERA_LOWER_BOUND]
     POWERUPS = [powerup for powerup in POWERUPS if powerup.y < CAMERA_LOWER_BOUND]
 
-# Function to remove power-up effects
+# Function to handle power-up effects
 def handlePowerups():
     for powerup in DYNAMIC.values():
         if isinstance(powerup, dict):
             # Decrement the timer if necessary
             powerup['timer'] = max(0, powerup['timer'] - 1)
+
             # Set the active property based on the time left on the timer
             powerup['active'] = powerup['timer'] > 0
 
@@ -319,13 +322,11 @@ def playerFell():
     # An object placed just below the visible screen
     game_over_rect = pygame.Rect(-WINDOW_WIDTH, GAME_OVER_Y_POSITION, WINDOW_WIDTH * 3, 1)
 
-    if pluto.hitbox.colliderect(game_over_rect):
-        return True
-    else:
-        return False
+    # Return True if pluto touches the trigger 
+    return True if pluto.hitbox.colliderect(game_over_rect) else False
 
 
-# Function to update the background position as player ascends
+# Function to move the background as the player ascends
 def updateBackgroundYPosition():
     # Calculate the maximum offset the background can move vertically
     max_offset = -(background_image.get_rect().height - WINDOW_HEIGHT)
@@ -377,7 +378,7 @@ def displayEndScreen():
     # Change high score if necessary
     DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
     
-    # Named variables
+    # Constants
     GAP = 70
     CONTENT_Y_POSITION = WINDOW_HEIGHT // 2 - 25
 
@@ -406,14 +407,18 @@ def displayEndScreen():
             if event.type == pygame.QUIT:
                 exitGame()
 
-        # Draw background
+            # Mute or unmute the music when pressing 'm'
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
+
+        # Draw the background
         updateBackgroundYPosition()
         surface.blit(background_image, (0, DYNAMIC["background_y_position"]))
 
         # Draw the score
         surface.blit(score_surface, score_rect)
 
-        # Draw buttons
+        # Draw the buttons
         play_again_button.draw(surface)
         exit_button.draw(surface)
 

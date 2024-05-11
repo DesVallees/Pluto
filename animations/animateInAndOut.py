@@ -2,16 +2,18 @@
 
 import pygame
 
-def animateTextInAndOut(surface, font, text, initial_size, max_size, color, center, total_duration, time_left, animation_duration):
-    time_passed = total_duration - time_left
+def animateTextInAndOut(surface, font, text, initialSize, maxSize, color, center, totalDuration, timeLeft, animationDuration):
+    time_passed = totalDuration - timeLeft
 
     # Calculate current text scale
-    if time_passed < animation_duration:
+    if time_passed < animationDuration:
         # Growing phase
-        scale = 1 * (time_passed / animation_duration)
-    elif time_passed >  total_duration - animation_duration:
+        scale = 1 * (time_passed / animationDuration)
+
+    elif time_passed >  totalDuration - animationDuration:
         # Shrinking phase
-        scale = 1 * ((total_duration - time_passed) / animation_duration)
+        scale = 1 * ((totalDuration - time_passed) / animationDuration)
+
     else:
         # Middle phase
         scale = 1
@@ -20,7 +22,7 @@ def animateTextInAndOut(surface, font, text, initial_size, max_size, color, cent
     scale = max(0, min(1, scale))
 
     # Calculate font size and opacity (alpha value)
-    size = int(initial_size + (max_size - initial_size) * scale)
+    size = int(initialSize + (maxSize - initialSize) * scale)
     alpha = int(255 * scale)
 
     # Render the text
@@ -34,16 +36,18 @@ def animateTextInAndOut(surface, font, text, initial_size, max_size, color, cent
     # Display the text
     surface.blit(text_surface, text_rect)
 
-def animateCircleInAndOut(surface, RGB_color, center, initial_radius, max_radius, max_alpha, total_duration, time_left, animation_duration):
-    time_passed = total_duration - time_left
+def animateCircleInAndOut(surface, colorRGB, center, initialRadius, maxRadius, maxAlpha, totalDuration, timeLeft, animationDuration):
+    time_passed = totalDuration - timeLeft
 
     # Calculate current circle scale
-    if time_passed < animation_duration:
+    if time_passed < animationDuration:
         # Growing phase
-        scale = (time_passed / animation_duration)
-    elif time_passed > total_duration - animation_duration:
+        scale = (time_passed / animationDuration)
+
+    elif time_passed > totalDuration - animationDuration:
         # Shrinking phase
-        scale = ((total_duration - time_passed) / animation_duration)
+        scale = ((totalDuration - time_passed) / animationDuration)
+
     else:
         # Middle phase
         scale = 1
@@ -52,14 +56,14 @@ def animateCircleInAndOut(surface, RGB_color, center, initial_radius, max_radius
     scale = max(0, min(1, scale))
 
     # Calculate radius and opacity (alpha value)
-    radius = int(initial_radius + (max_radius - initial_radius) * scale)
-    alpha = min(int(255 * scale), max_alpha)
+    radius = int(initialRadius + (maxRadius - initialRadius) * scale)
+    alpha = min(int(255 * scale), maxAlpha)
 
     # Create a temporary surface with alpha support to draw the circle
     temp_surface = pygame.Surface((2 * radius, 2 * radius), pygame.SRCALPHA)
 
-    # Create an RGBA color tuple including the alpha value (opacity)
-    rgba_color = RGB_color + (alpha,)
+    # Create an RGBA color tuple including the alpha value
+    rgba_color = colorRGB + (alpha,)
 
     # Draw the circle
     pygame.draw.circle(temp_surface, rgba_color, (radius, radius), radius)

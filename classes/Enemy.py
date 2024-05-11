@@ -57,7 +57,7 @@ class Enemy:
             # Update sprite
             self.current_sprite = self.sprite_left if self.direction == -1 else self.sprite_right
 
-    # Returns true if the enemy touches the target while being alive
+    # Returns True if the enemy touches the target while being alive
     def collidedWith(self, target):
         return self.hitbox.colliderect(target.hitbox) and self.is_alive
     
@@ -67,7 +67,7 @@ class Enemy:
 
         self.hitbox.update(self.x, self.y + TRIM_PX_TOP, self.width, self.height - TRIM_PX_TOP)
 
-    # There is one in {argument} chances method returns true
+    # There is one in {argument} chances method returns True
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
     

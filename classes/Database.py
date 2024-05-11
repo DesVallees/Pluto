@@ -13,6 +13,7 @@ class Database:
         try:
             with open(self.path, 'r') as file:
                 self.data = json.load(file)
+
         except IOError as error:
             print(f"Error loading data from {self.path}: {error}")
             self.data = {}
@@ -20,10 +21,11 @@ class Database:
     # Private method to save data to file
     def _save(self):
         try:
-            os.makedirs(os.path.dirname(self.path), exist_ok=True) # exist_ok to not raise an error if the directory already exists
+            os.makedirs(os.path.dirname(self.path), exist_ok=True) # "exist_ok" to not raise an error if the directory already exists
 
             with open(self.path, 'w') as file:
-                json.dump(self.data, file, indent=4) # indent to make the file more readable
+                json.dump(self.data, file, indent=4) # "indent" to make the file more readable
+                
         except IOError as error:
             print(f"Error saving data to {self.path}: {error}")
 

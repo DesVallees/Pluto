@@ -19,7 +19,7 @@ class PowerUp:
 
         # Power-up's coordinates
         self.possible_x_values = possibleXValues
-        self.x = random.randint(possibleXValues[0], possibleXValues[1] - self.width)
+        self.x = random.randint(possibleXValues[0] + self.width, possibleXValues[1] - self.width)
         self.y = y - self.height # Subtract height to make sure it is shown on top of the surface it was placed on
 
         # Initialize power-up's hitbox
@@ -29,11 +29,11 @@ class PowerUp:
     def tick(self):
         self.updateHitbox()
 
-    # Returns true if the power-up touches the target
+    # Returns True if the power-up touches the target
     def collidedWith(self, target):
         return self.hitbox.colliderect(target.hitbox)
 
-    # Method to apply a certain effect depending on the type of power-up 
+    # Method to apply a certain effect depending on the power-up's type 
     def applyEffect(self, controls, frameRate):
         if self.type == 'invincibility':
             controls["invincibility"]["timer"] = frameRate * 3 # Make power-up last 3 seconds

@@ -7,7 +7,7 @@ class Platform:
         # Set platform type
         self.type = self.determinePlatformType()
         
-        # Load sprites
+        # Load sprite
         self.platform_sprite = sprite
 
         # Initialize sprite rectangle
@@ -53,17 +53,10 @@ class Platform:
 
     # Method to determine platform's type
     def determinePlatformType(self):
-        random_number = random.randint(1, 100)
-
-        # Create a normal platform: 90% chance
-        if random_number < 90:
-            return "normal"
-
         # Create a moving platform: 10% chance
-        else:
-            return "moving"
+        return "moving" if self.oneInXChances(10) else "normal"
 
-    # There is one in {argument} chances method returns true
+    # There is one in {argument} chances method returns True
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
 
