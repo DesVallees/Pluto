@@ -13,7 +13,7 @@ from animations.animateInAndOut import *
 # Constants
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
-FRAME_RATE = 45
+NORMAL_FRAME_RATE = 50
 
 # Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
@@ -88,6 +88,11 @@ DYNAMIC = {
     "target_background_y_position": None
 }
 
+# Dictionary to store game settings
+SETTINGS = {
+    "frame_rate": NORMAL_FRAME_RATE
+}
+
 # Lists with game objects
 PLATFORMS = []
 ENEMIES = []
@@ -109,12 +114,17 @@ def main():
     while running:
         # Event loop
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 exitGame()
 
             # Mute or unmute the music when pressing 'm'
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
                 pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
+
+            # Cheats: Add 5 points when pressing 'b'
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+                DYNAMIC["score"] += 5
+                DYNAMIC["score_boost"]["timer"] = 0.8 * SETTINGS["frame_rate"]
 
         # Manage game objects
         createObjects()
@@ -129,9 +139,11 @@ def main():
         # Check if the player has fallen off the screen
         if playerFell(): running = False
 
-        # Movement controls
+
+        # Get the keys that are being pressed
         keys = pygame.key.get_pressed()
         
+        # Movement controls
         if keys[pygame.K_LEFT] or keys[pygame.K_a]: 
             pluto.move(-pluto.speed)
 
@@ -148,8 +160,15 @@ def main():
             pluto.current_direction = "idle"
             pluto.current_sprites = pluto.sprites_idle
 
-        if keys[pygame.K_SPACE] or keys[pygame.K_UP] or keys[pygame.K_w]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
             pluto.jump()
+
+        # Cheats: 'i' to activate invincibility - 'x' to activate double points
+        if keys[pygame.K_i]: DYNAMIC["invincibility"]["timer"] = 20
+        if keys[pygame.K_x]: DYNAMIC["double_points"]["timer"] = 30
+
+        # Cheats: 't' to double frame rate
+        SETTINGS["frame_rate"] = (NORMAL_FRAME_RATE * 2) if keys[pygame.K_t] else NORMAL_FRAME_RATE
 
 
         # Draw background
@@ -200,7 +219,7 @@ def main():
 
             # Handle power-up collision with pluto
             if powerup.collidedWith(pluto): 
-                powerup.applyEffect(DYNAMIC, FRAME_RATE)
+                powerup.applyEffect(DYNAMIC, SETTINGS["frame_rate"])
 
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
@@ -222,19 +241,19 @@ def main():
         if DYNAMIC["invincibility"]["active"]:
             # Draw a force field around Pluto
             animateCircleInAndOut(surface, colorRGB=(60, 60, 255), center=pluto.sprite_rect.center, initialRadius=0, maxRadius=pluto.height, 
-                               maxAlpha=50, totalDuration=3, timeLeft=DYNAMIC["invincibility"]["timer"] / FRAME_RATE, animationDuration=0.2)
+                               maxAlpha=50, totalDuration=3, timeLeft=DYNAMIC["invincibility"]["timer"] / SETTINGS["frame_rate"], animationDuration=0.2)
             
         if DYNAMIC["score_boost"]["active"]:
             # Draw "+5" next to Pluto
             animateTextInAndOut(surface, game_font, text="+5", initialSize=0, maxSize=30, color="green",
                              center=(pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), totalDuration=0.8,
-                             timeLeft=DYNAMIC["score_boost"]["timer"] / FRAME_RATE, animationDuration=0.2)
+                             timeLeft=DYNAMIC["score_boost"]["timer"] / SETTINGS["frame_rate"], animationDuration=0.2)
             
         elif DYNAMIC["double_points"]["active"]:
             # Draw "2x" next to Pluto
             animateTextInAndOut(surface, game_font, text = "2x", initialSize=0, maxSize=30, color="chartreuse",
                              center=(pluto.x + pluto.width + PLUTO_PERSONAL_SPACE, pluto.y + pluto.camera_y_offset), totalDuration=5,
-                             timeLeft=DYNAMIC["double_points"]["timer"] / FRAME_RATE, animationDuration=0.3)
+                             timeLeft=DYNAMIC["double_points"]["timer"] / SETTINGS["frame_rate"], animationDuration=0.3)
 
 
         # Display current score
@@ -256,7 +275,7 @@ def main():
         pygame.display.flip()
 
         # Set frame rate
-        clock.tick(FRAME_RATE)
+        clock.tick(SETTINGS["frame_rate"])
 
     # Display end screen
     displayEndScreen()
@@ -344,7 +363,7 @@ def updateBackgroundYPosition():
     # If the target has not been achieved...
     if not target_accomplished:
         # Calculate moving speed relative to frame rate for smooth transition
-        MOVING_SPEED = (target + position) / FRAME_RATE
+        MOVING_SPEED = (target + position) / NORMAL_FRAME_RATE
 
         # Determine the direction of movement -1 for up, 2 for down
         DIRECTION = -1 if target > position else 2
@@ -424,7 +443,7 @@ def displayEndScreen():
 
         # Update the display
         pygame.display.flip()
-        clock.tick(FRAME_RATE)
+        clock.tick(NORMAL_FRAME_RATE)
 
 # Function to start a new game
 def startGame():
