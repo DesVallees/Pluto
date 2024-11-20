@@ -13,7 +13,7 @@ from animations.animateInAndOut import *
 # Constants
 WINDOW_WIDTH = 400
 WINDOW_HEIGHT = 800
-NORMAL_FRAME_RATE = 50
+NORMAL_FRAME_RATE = 45
 
 # Color RGB codes
 LIGHT_GREEN = (100, 255, 100)
@@ -121,8 +121,8 @@ def main():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
                 pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
 
-            # Cheats: Add 5 points when pressing 'b'
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+            # Cheats: Add 5 points when pressing 'o'
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
                 DYNAMIC["score"] += 5
                 DYNAMIC["score_boost"]["timer"] = 0.8 * SETTINGS["frame_rate"]
 
@@ -163,12 +163,12 @@ def main():
         if keys[pygame.K_UP] or keys[pygame.K_w]:
             pluto.jump()
 
-        # Cheats: 'i' to activate invincibility - 'x' to activate double points
+        # Cheats: 'i' to activate invincibility - 'u' to activate double points
         if keys[pygame.K_i]: DYNAMIC["invincibility"]["timer"] = 20
-        if keys[pygame.K_x]: DYNAMIC["double_points"]["timer"] = 30
+        if keys[pygame.K_u]: DYNAMIC["double_points"]["timer"] = 30
 
-        # Cheats: 't' to double frame rate
-        SETTINGS["frame_rate"] = (NORMAL_FRAME_RATE * 2) if keys[pygame.K_t] else NORMAL_FRAME_RATE
+        # Cheats: 'y' to double frame rate
+        SETTINGS["frame_rate"] = (NORMAL_FRAME_RATE * 2) if keys[pygame.K_y] else NORMAL_FRAME_RATE
 
 
         # Draw background
