@@ -101,6 +101,7 @@ POWERUPS = []
 # Play music
 pygame.mixer.music.load('static/audio/music.ogg')
 pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.5)
 
 # Flag to control game state
 running = True
