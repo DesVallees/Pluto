@@ -15,7 +15,7 @@ CAMERA_FOLLOW_OFFSET = SCREEN_BOTTOM - 300  # Position where the camera will pla
 
 class Player:
     # Constructor for Player class
-    def __init__(self, sprites):
+    def __init__(self, sprites, sounds):
         self.is_alive = True
         
         # Player's coordinates
@@ -34,6 +34,12 @@ class Player:
         self.is_jumping = False
         self.current_falling_speed = 1
         self.current_jumping_strength = JUMPING_STRENGTH
+
+        # Load sounds
+        self.sounds = sounds
+        self.sounds["jump"].set_volume(0.8)
+        self.sounds["damage"].set_volume(0.5)
+
 
         # Load sprites
         self.sprites_right = sprites["right"]
@@ -79,6 +85,10 @@ class Player:
 
     # Method to handle jump animation
     def jump(self, overrideSurfaceCondition = False):
+        if self.is_on_surface:
+            # Play jumping sound
+            self.sounds["jump"].play()
+        
         if self.is_on_surface or overrideSurfaceCondition:
             # Update player's state
             self.is_on_surface = False
@@ -185,6 +195,9 @@ class Player:
     def die(self):
         if self.is_alive:
             self.is_alive = False
+
+            # Play dying sound
+            self.sounds["damage"].play()
 
             # Player does a tiny jump before falling
             self.current_jumping_strength = 15

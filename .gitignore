@@ -1,5 +1,8 @@
-# Ignore any pycache folders that are created when running the game
-__pycache__/
-
 # Ignore database folder that stores personal data (high score)
 database/
+
+# Ignore any cache folders that are created when running the game on PC
+__pycache__/
+
+# Ignore any cache files that are created when running the game on macOS
+.DS_Store

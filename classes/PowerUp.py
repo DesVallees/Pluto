@@ -3,9 +3,12 @@ import random
 
 class PowerUp:
     # Constructor for PowerUp class
-    def __init__(self, powerupImages, possibleXValues, y):
+    def __init__(self, powerupImages, possibleXValues, y, sounds):
         # Set power-up's type
         self.type = self.determineType()
+        
+        # Load sounds
+        self.sounds = sounds
         
         # Load appropriate sprite
         self.powerup_sprite = powerupImages[self.type]
@@ -36,14 +39,17 @@ class PowerUp:
     # Method to apply a certain effect depending on the power-up's type 
     def applyEffect(self, controls, frameRate):
         if self.type == 'invincibility':
+            self.sounds["invincibility"].play()
             controls["invincibility"]["timer"] = frameRate * 3 # Make power-up last 3 seconds
 
         elif self.type == 'double_points':
+            self.sounds["double"].play()
             controls["double_points"]["timer"] = frameRate * 5 # Make power-up last 5 seconds
 
         elif self.type == 'score_boost':
+            self.sounds["add"].play()
             controls["score_boost"]["timer"] = frameRate * 0.8 # For animation purposes
-            
+
             controls["score"] += 5
 
     # Method to update power-up's hitbox

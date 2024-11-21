@@ -4,7 +4,7 @@ import math
 
 class Enemy:
     # Constructor for Enemy class
-    def __init__(self, sprites, possibleXValues, y):
+    def __init__(self, sprites, possibleXValues, y, sounds):
         self.is_alive = True
         
         # Movement controls
@@ -15,6 +15,10 @@ class Enemy:
         # Fly-away controls
         self.x_flying_speed = 0
         self.y_flying_speed = 0
+        
+        # Load sounds
+        self.sounds = sounds
+        self.sounds["enemyDeath"].set_volume(0.75)
         
         # Load sprites
         self.sprite_left = sprites["left"]
@@ -85,6 +89,9 @@ class Enemy:
             # Calculate fly-away speeds based on the angle
             self.y_flying_speed = math.sin(angle) * 65
             self.x_flying_speed = math.cos(angle) * (25 if abs(self.y_flying_speed) > 20 else 60)
+
+            # Play dying sound
+            self.sounds["enemyDeath"].play()
 
             # Update enemy's state
             self.is_alive = False

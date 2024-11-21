@@ -58,15 +58,32 @@ powerupImages = {
     'score_boost': load(f"{powerupPath}/add.png"),
 }
 
+# Play music
+pygame.mixer.music.load('static/audio/ambient.mp3')
+pygame.mixer.music.play(-1)
+
+# Load sounds
+sound = pygame.mixer.Sound
+audiosPath = "static/audio"
+sounds = {
+    'jump': sound(f"{audiosPath}/jump.mp3"),
+    'damage': sound(f"{audiosPath}/damage.mp3"),
+    'death': sound(f"{audiosPath}/death.mp3"),
+    'enemyDeath': sound(f"{audiosPath}/enemy_death.mp3"),
+    'invincibility': sound(f"{audiosPath}/invincibility.mp3"),
+    'add': sound(f"{audiosPath}/add.mp3"),
+    'double': sound(f"{audiosPath}/2x.mp3")
+}
+
 # Database instance
 db = Database()
 
 # Player instance
-pluto = Player(playerImages)
+pluto = Player(playerImages, sounds)
 PLUTO_PERSONAL_SPACE = 15 # Distance between the satellite/power-up cues and pluto's image
 
 # Set window icon to one of pluto's images
-pygame.display.set_icon(pluto.sprites_right[0])
+pygame.display.set_icon(pluto.sprites_idle[0])
 
 # Dictionary to store dynamic variables
 DYNAMIC = {
@@ -97,11 +114,6 @@ SETTINGS = {
 PLATFORMS = []
 ENEMIES = []
 POWERUPS = []
-
-# Play music
-pygame.mixer.music.load('static/audio/music.ogg')
-pygame.mixer.music.play(-1)
-pygame.mixer.music.set_volume(0.5)
 
 # Flag to control game state
 running = True
@@ -302,7 +314,7 @@ def createObjects():
         if platform_instance.hasEnemy:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            enemy_instance = Enemy(enemyImages, possible_x_values, y_position)
+            enemy_instance = Enemy(enemyImages, possible_x_values, y_position, sounds)
             
             ENEMIES.append(enemy_instance)
 
@@ -310,7 +322,7 @@ def createObjects():
         elif platform_instance.hasPowerUp:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
             y_position = platform_instance.y
-            powerup_instance = PowerUp(powerupImages, possible_x_values, y_position)
+            powerup_instance = PowerUp(powerupImages, possible_x_values, y_position, sounds)
             
             POWERUPS.append(powerup_instance)
 
@@ -381,7 +393,7 @@ def updateBackgroundYPosition():
         DYNAMIC["target_background_y_position"] = None
 
         # Normalize the camera offset to a scale that makes the background movement smoother
-        normalized_camera_offset = pluto.camera_y_offset / (35 * WINDOW_HEIGHT) # 35 is an arbitrary number, the background stops moving at a score of ~200
+        normalized_camera_offset = pluto.camera_y_offset / (45 * WINDOW_HEIGHT) # 45 is an arbitrary number, the background stops moving at a score of ~250
 
         # Ensure the normalized value stays within the range 0 to 1
         clamped_value = max(0, min(1, normalized_camera_offset))
@@ -397,6 +409,9 @@ def displayEndScreen():
     
     # Change high score if necessary
     DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
+    
+    # Play death sound
+    sounds["death"].play()
     
     # Constants
     GAP = 70
@@ -450,7 +465,7 @@ def displayEndScreen():
 def startGame():
     # Reset player instance
     global pluto
-    pluto = Player(playerImages)
+    pluto = Player(playerImages, sounds)
     
     # Reset dynamic variables
     DYNAMIC["score"] = 0
