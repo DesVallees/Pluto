@@ -56,7 +56,7 @@ class Platform:
         # Create a moving platform: 10% chance
         return "moving" if self.oneInXChances(10) else "normal"
 
-    # There is one in {argument} chances method returns True
+    # There is one in {argument} chances the method returns True
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
 

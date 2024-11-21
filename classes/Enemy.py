@@ -67,7 +67,7 @@ class Enemy:
 
         self.hitbox.update(self.x, self.y + TRIM_PX_TOP, self.width, self.height - TRIM_PX_TOP)
 
-    # There is one in {argument} chances method returns True
+    # There is one in {argument} chances the method returns True
     def oneInXChances(self, x):
         return random.randint(1, 100) <= 100 / x
     

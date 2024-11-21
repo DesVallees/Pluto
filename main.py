@@ -168,8 +168,8 @@ def main():
         if keys[pygame.K_i]: DYNAMIC["invincibility"]["timer"] = 20
         if keys[pygame.K_u]: DYNAMIC["double_points"]["timer"] = 30
 
-        # Cheats: 'y' to double frame rate
-        SETTINGS["frame_rate"] = (NORMAL_FRAME_RATE * 2) if keys[pygame.K_y] else NORMAL_FRAME_RATE
+        # Cheats: 'y' to double frame rate - 't' to halve frame rate
+        SETTINGS["frame_rate"] = (NORMAL_FRAME_RATE * 2) if keys[pygame.K_y] else (NORMAL_FRAME_RATE / 2) if keys[pygame.K_t] else NORMAL_FRAME_RATE
 
 
         # Draw background
