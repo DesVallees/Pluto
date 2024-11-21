@@ -62,8 +62,10 @@ class Platform:
 
     # Method to update platform's hitbox
     def updateHitbox(self):
-        self.hitbox.x = self.x
-        self.hitbox.y = self.y
+        TRIM_PX_TOP = 7
+        TRIM_PX_BOTTOM = 20
+
+        self.hitbox.update(self.x, self.y + TRIM_PX_TOP, self.width, self.height - TRIM_PX_TOP - TRIM_PX_BOTTOM)
 
     # Method that gets called every frame if it's a moving platform
     def movePlatform(self, player):

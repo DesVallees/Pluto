@@ -117,7 +117,7 @@ class Player:
         for platform in platforms:
             if self.hitbox.colliderect(platform.hitbox):
                 player_is_on_platform = True
-                platformYPosition = platform.y - self.height + 2 # Add 2 pixels to avoid character jounce glitch
+                platformYPosition = platform.hitbox.y - self.height + 2 # Add 2 pixels to avoid character jounce glitch
 
                 # Set platform's touched attribute to True
                 platform.touched = True

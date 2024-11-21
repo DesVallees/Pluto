@@ -9,6 +9,7 @@ from classes.Database import Database
 from classes.Button import Button
 
 from animations.animateInAndOut import *
+from animations.drawShadow import *
 
 # Constants
 WINDOW_WIDTH = 400
@@ -202,12 +203,33 @@ def main():
         )
         pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
             
+        # Draw platforms
+        for platform in PLATFORMS:
+            surface.blit(platform.platform_sprite, platform.sprite_rect)
+            platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
+
+            # Update Platform instance every frame
+            platform.tick(pluto)
+
+            # Increase score if the platform is touched for the first time
+            if platform.touched and not platform.hasChangedScore:
+                DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
+                platform.hasChangedScore = True
+            
+        # Draw shadow under the pluto if it's on a platform
+        if pluto.is_on_surface:
+            draw_shadow(surface, x=pluto.x, y=pluto.y + pluto.height / 1.25 + pluto.camera_y_offset, width=pluto.width, height=pluto.width / 3)
+
         # Draw pluto
         surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
         pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
 
         # Draw enemies
         for enemy in ENEMIES:
+            # Draw shadow under the enemy
+            draw_shadow(surface, x=enemy.x, y=enemy.y + enemy.height / 2 + pluto.camera_y_offset, width=enemy.width, height=pluto.width / 3)
+            
+            # Draw the enemy sprite
             surface.blit(enemy.current_sprite, enemy.sprite_rect)
             enemy.sprite_rect.update(enemy.x, enemy.y + pluto.camera_y_offset, enemy.width, enemy.height)
 
@@ -224,6 +246,10 @@ def main():
 
         # Draw power-ups
         for powerup in POWERUPS:
+            # Draw shadow under the power-ups
+            draw_shadow(surface, x=powerup.x, y=powerup.y + powerup.height / 2 + pluto.camera_y_offset, width=powerup.width)
+
+            # Draw the platform sprite
             surface.blit(powerup.powerup_sprite, powerup.sprite_rect)
             powerup.sprite_rect.update(powerup.x, powerup.y + pluto.camera_y_offset, powerup.width, powerup.height)
 
@@ -236,19 +262,6 @@ def main():
 
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
-
-        # Draw platforms
-        for platform in PLATFORMS:
-            surface.blit(platform.platform_sprite, platform.sprite_rect)
-            platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
-
-            # Update Platform instance every frame
-            platform.tick(pluto)
-
-            # Increase score if the platform is touched for the first time
-            if platform.touched and not platform.hasChangedScore:
-                DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
-                platform.hasChangedScore = True
 
         # Draw active power-up's visual effect
         if DYNAMIC["invincibility"]["active"]:
@@ -296,6 +309,7 @@ def main():
 
 # Function to fill the PLATFORMS, ENEMIES and POWERUPS lists with respective instances
 def createObjects():
+    PLATFORM_CENTER_OFFSET = 7
     PLATFORM_GAP = 200
     PADDING = 20
     CAMERA_UPPER_BOUND = -pluto.camera_y_offset
@@ -313,7 +327,7 @@ def createObjects():
         # Add an enemy if needed
         if platform_instance.hasEnemy:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
-            y_position = platform_instance.y
+            y_position = platform_instance.hitbox.y + PLATFORM_CENTER_OFFSET
             enemy_instance = Enemy(enemyImages, possible_x_values, y_position, sounds)
             
             ENEMIES.append(enemy_instance)
@@ -321,7 +335,7 @@ def createObjects():
         # Add a power-up if needed
         elif platform_instance.hasPowerUp:
             possible_x_values = [platform_instance.x, platform_instance.x + platform_instance.width]
-            y_position = platform_instance.y
+            y_position = platform_instance.hitbox.y + PLATFORM_CENTER_OFFSET * 1.5
             powerup_instance = PowerUp(powerupImages, possible_x_values, y_position, sounds)
             
             POWERUPS.append(powerup_instance)
