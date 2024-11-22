@@ -218,29 +218,12 @@ def main():
             platform.sprite_rect.update(platform.x, platform.y + pluto.camera_y_offset, platform.width, platform.height)
 
             # Update Platform instance every frame
-            platform.tick(pluto)
+            platform.tick(pluto, frameRateFactor = SETTINGS["frame_rate"] / NORMAL_FRAME_RATE)
 
             # Increase score if the platform is touched for the first time
             if platform.touched and not platform.hasChangedScore:
                 DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
                 platform.hasChangedScore = True
-
-        # Draw pluto's satellite
-        SATELLITE_RADIUS = 10
-        SATELLITE_COLOR = (
-            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
-            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
-            0, # Blue value
-        )
-        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
-            
-        # Draw shadow under the pluto if it's on a platform
-        if pluto.is_on_surface:
-            draw_shadow(surface, x=pluto.x, y=pluto.y + pluto.height / 1.25 + pluto.camera_y_offset, width=pluto.width, height=pluto.width / 3)
-
-        # Draw pluto
-        surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
-        pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
 
         # Draw enemies
         for enemy in ENEMIES:
@@ -252,7 +235,7 @@ def main():
             enemy.sprite_rect.update(enemy.x, enemy.y + pluto.camera_y_offset, enemy.width, enemy.height)
 
             # Update Enemy instance every frame
-            enemy.tick(WINDOW_WIDTH, WINDOW_HEIGHT)
+            enemy.tick(WINDOW_WIDTH, WINDOW_HEIGHT, frameRateFactor = SETTINGS["frame_rate"] / NORMAL_FRAME_RATE)
 
             # Handle enemy collision with pluto
             if enemy.collidedWith(pluto):
@@ -280,6 +263,23 @@ def main():
 
                 # Move power-up out of the screen so it's deleted by removeOffScreenObjects function
                 powerup.y = WINDOW_HEIGHT * 2
+
+        # Draw pluto's satellite
+        SATELLITE_RADIUS = 10
+        SATELLITE_COLOR = (
+            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
+            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
+            0, # Blue value
+        )
+        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
+            
+        # Draw shadow under the pluto if it's on a platform
+        if pluto.is_on_surface:
+            draw_shadow(surface, x=pluto.x, y=pluto.y + pluto.height / 1.25 + pluto.camera_y_offset, width=pluto.width, height=pluto.width / 3)
+
+        # Draw pluto
+        surface.blit(pluto.current_sprites[int(pluto.current_frame)], pluto.sprite_rect)
+        pluto.sprite_rect.update(pluto.x, pluto.y + pluto.camera_y_offset, pluto.width, pluto.height)
 
         # Draw active power-up's visual effect
         if DYNAMIC["invincibility"]["active"]:

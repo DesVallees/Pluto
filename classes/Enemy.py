@@ -44,15 +44,15 @@ class Enemy:
         self.hitbox = pygame.Rect(self.x, self.y, self.width, self.height)
 
     # Method that gets called every frame
-    def tick(self, windowWidth, windowHeight):
+    def tick(self, windowWidth, windowHeight, frameRateFactor):
         self.updateHitbox()
         
         if not self.is_alive: self.flyAway(windowWidth, windowHeight)
-        elif self.moving_enemy: self.move()
+        elif self.moving_enemy: self.move(frameRateFactor)
 
     # Move the enemy considering platform surface
-    def move(self):
-        self.x += self.speed * self.direction
+    def move(self, frameRateFactor):
+        self.x += self.speed * self.direction * frameRateFactor
 
         # If enemy has reached platform border
         if self.x < self.min_x_value or self.x > self.max_x_value:
