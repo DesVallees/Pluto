@@ -60,21 +60,31 @@ powerupImages = {
 }
 
 # Play music
-pygame.mixer.music.load('static/audio/ambient.mp3')
-pygame.mixer.music.play(-1)
+try:
+    pygame.mixer.music.load('static/audio/ambient.mp3')
+    pygame.mixer.music.play(-1)
+except Exception as e:
+    print(f"Error loading music: {e}")
 
 # Load sounds
-sound = pygame.mixer.Sound
 audiosPath = "static/audio"
-sounds = {
-    'jump': sound(f"{audiosPath}/jump.mp3"),
-    'damage': sound(f"{audiosPath}/damage.mp3"),
-    'death': sound(f"{audiosPath}/death.mp3"),
-    'enemyDeath': sound(f"{audiosPath}/enemy_death.mp3"),
-    'invincibility': sound(f"{audiosPath}/invincibility.mp3"),
-    'add': sound(f"{audiosPath}/add.mp3"),
-    'double': sound(f"{audiosPath}/2x.mp3")
+sounds = {}
+
+sound_files = {
+    'jump': f"{audiosPath}/jump.mp3",
+    'damage': f"{audiosPath}/damage.mp3",
+    'death': f"{audiosPath}/death.mp3",
+    'enemyDeath': f"{audiosPath}/enemy_death.mp3",
+    'invincibility': f"{audiosPath}/invincibility.mp3",
+    'add': f"{audiosPath}/add.mp3",
+    'double': f"{audiosPath}/2x.mp3"
 }
+
+for key, path in sound_files.items():
+    try:
+        sounds[key] = pygame.mixer.Sound(path)
+    except Exception as e:
+        print(f"Error loading sound '{key}' from {path}: {e}")
 
 # Database instance
 db = Database()
@@ -422,7 +432,8 @@ def displayEndScreen():
     DYNAMIC["high_score"] = max(DYNAMIC["score"], DYNAMIC["high_score"])
     
     # Play death sound
-    sounds["death"].play()
+    if "death" in sounds:
+        sounds["death"].play()
     
     # Constants
     GAP = 70

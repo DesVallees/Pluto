@@ -18,7 +18,8 @@ class Enemy:
         
         # Load sounds
         self.sounds = sounds
-        self.sounds["enemyDeath"].set_volume(0.75)
+        if "enemyDeath" in self.sounds:
+            self.sounds["enemyDeath"].set_volume(0.5)
         
         # Load sprites
         self.sprite_left = sprites["left"]
@@ -91,7 +92,8 @@ class Enemy:
             self.x_flying_speed = math.cos(angle) * (25 if abs(self.y_flying_speed) > 20 else 60)
 
             # Play dying sound
-            self.sounds["enemyDeath"].play()
+            if "enemyDeath" in self.sounds:
+                self.sounds["enemyDeath"].play()
 
             # Update enemy's state
             self.is_alive = False

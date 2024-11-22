@@ -37,8 +37,10 @@ class Player:
 
         # Load sounds
         self.sounds = sounds
-        self.sounds["jump"].set_volume(0.8)
-        self.sounds["damage"].set_volume(0.5)
+        if "jump" in self.sounds:
+            self.sounds["jump"].set_volume(0.8)
+        if "damage" in self.sounds:
+            self.sounds["damage"].set_volume(0.5)
 
 
         # Load sprites
@@ -87,7 +89,8 @@ class Player:
     def jump(self, overrideSurfaceCondition = False):
         if self.is_on_surface:
             # Play jumping sound
-            self.sounds["jump"].play()
+            if "jump" in self.sounds:
+                self.sounds["jump"].play()
         
         if self.is_on_surface or overrideSurfaceCondition:
             # Update player's state
@@ -197,7 +200,8 @@ class Player:
             self.is_alive = False
 
             # Play dying sound
-            self.sounds["damage"].play()
+            if "damage" in self.sounds:
+                self.sounds["damage"].play()
 
             # Player does a tiny jump before falling
             self.current_jumping_strength = 15
