@@ -12,7 +12,7 @@ from animations.animateInAndOut import *
 from animations.drawShadow import *
 
 # Constants
-WINDOW_WIDTH = 400
+WINDOW_WIDTH = 500
 WINDOW_HEIGHT = 800
 NORMAL_FRAME_RATE = 45
 
@@ -191,18 +191,9 @@ def main():
 
         # Draw clouds if needed
         if (pluto.camera_y_offset < WINDOW_HEIGHT):
-            CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 10) + pluto.camera_y_offset)
+            CLOUDS_POSITION = (0, WINDOW_HEIGHT - (cloud_image.get_rect().height - 30) + pluto.camera_y_offset)
             surface.blit(cloud_image, CLOUDS_POSITION)
         
-        # Draw pluto's satellite
-        SATELLITE_RADIUS = 10
-        SATELLITE_COLOR = (
-            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
-            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
-            0, # Blue value
-        )
-        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
-            
         # Draw platforms
         for platform in PLATFORMS:
             surface.blit(platform.platform_sprite, platform.sprite_rect)
@@ -215,6 +206,15 @@ def main():
             if platform.touched and not platform.hasChangedScore:
                 DYNAMIC["score"] += 2 if DYNAMIC["double_points"]["active"] else 1
                 platform.hasChangedScore = True
+
+        # Draw pluto's satellite
+        SATELLITE_RADIUS = 10
+        SATELLITE_COLOR = (
+            min(DYNAMIC["score"] * 255 / 200, 255), # Red value: (score:value) 0:0, 200:255
+            max(255 - DYNAMIC["score"] * 255 / 200, 0), # Green value: (score:value) 0:255, 200:0
+            0, # Blue value
+        )
+        pygame.draw.circle(surface, SATELLITE_COLOR, (pluto.x, pluto.y + pluto.camera_y_offset), SATELLITE_RADIUS)
             
         # Draw shadow under the pluto if it's on a platform
         if pluto.is_on_surface:
@@ -392,8 +392,11 @@ def updateBackgroundYPosition():
         # Calculate moving speed relative to frame rate for smooth transition
         MOVING_SPEED = (target + position) / NORMAL_FRAME_RATE
 
-        # Determine the direction of movement -1 for up, 2 for down
-        DIRECTION = -1 if target > position else 2
+        # Make sure that the speed when going up is not too fast
+        if target > position: MOVING_SPEED = max(MOVING_SPEED, -2)
+
+        # Determine the direction of movement 1 for up, -1 for down
+        DIRECTION = 1 if target < position else -1
 
         # Update the position towards the target
         position += MOVING_SPEED * DIRECTION
@@ -440,13 +443,13 @@ def displayEndScreen():
     # Button Instances
     play_again_button = Button(
             text="Play Again", callback=startGame,
-            x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION,
+            x=WINDOW_WIDTH // 2 - 100, y=CONTENT_Y_POSITION,
             shortcutKeys=[pygame.K_p, pygame.K_s, pygame.K_DOWN]
         )
 
     exit_button = Button(
             text="Exit Game", callback=exitGame,
-            x=WINDOW_WIDTH // 4, y=CONTENT_Y_POSITION + GAP,
+            x=WINDOW_WIDTH // 2 - 100, y=CONTENT_Y_POSITION + GAP,
             shortcutKeys=[pygame.K_q, pygame.K_e, pygame.K_ESCAPE]
         )
     
