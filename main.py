@@ -118,7 +118,8 @@ DYNAMIC = {
 
 # Dictionary to store game settings
 SETTINGS = {
-    "frame_rate": NORMAL_FRAME_RATE
+    "frame_rate": NORMAL_FRAME_RATE,
+    "mute": False
 }
 
 # Lists with game objects
@@ -141,9 +142,16 @@ def main():
             if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 exitGame()
 
-            # Mute or unmute the music when pressing 'm'
+            # Mute or unmute the game when pressing 'm'
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
-                pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
+                SETTINGS["mute"] = not SETTINGS["mute"]  # Toggle mute state
+                
+                # Adjust music volume
+                pygame.mixer.music.set_volume(0 if SETTINGS["mute"] else 1)
+
+                # Adjust sound effects volume
+                for sound in sounds.values():
+                    sound.set_volume(0 if SETTINGS["mute"] else 1)
 
             # Cheats: Add 5 points when pressing 'o'
             if event.type == pygame.KEYDOWN and event.key == pygame.K_o:
@@ -464,9 +472,16 @@ def displayEndScreen():
             if event.type == pygame.QUIT:
                 exitGame()
 
-            # Mute or unmute the music when pressing 'm'
+            # Mute or unmute the game when pressing 'm'
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
-                pygame.mixer.music.fadeout(500) if pygame.mixer.music.get_busy() else pygame.mixer.music.play(-1, 1, 500)
+                SETTINGS["mute"] = not SETTINGS["mute"]  # Toggle mute state
+                
+                # Adjust music volume
+                pygame.mixer.music.set_volume(0 if SETTINGS["mute"] else 1)
+
+                # Adjust sound effects volume
+                for sound in sounds.values():
+                    sound.set_volume(0 if SETTINGS["mute"] else 1)
 
         # Draw the background
         updateBackgroundYPosition()

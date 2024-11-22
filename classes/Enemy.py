@@ -18,7 +18,7 @@ class Enemy:
         
         # Load sounds
         self.sounds = sounds
-        if "enemyDeath" in self.sounds:
+        if "enemyDeath" in self.sounds and self.sounds["enemyDeath"].get_volume() != 0:
             self.sounds["enemyDeath"].set_volume(0.5)
         
         # Load sprites

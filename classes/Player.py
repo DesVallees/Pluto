@@ -37,9 +37,9 @@ class Player:
 
         # Load sounds
         self.sounds = sounds
-        if "jump" in self.sounds:
+        if "jump" in self.sounds and self.sounds["jump"].get_volume() != 0:
             self.sounds["jump"].set_volume(0.8)
-        if "damage" in self.sounds:
+        if "damage" in self.sounds and self.sounds["damage"].get_volume() != 0:
             self.sounds["damage"].set_volume(0.5)
 
 
