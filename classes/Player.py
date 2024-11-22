@@ -1,7 +1,7 @@
 import pygame
 
 # Constants
-SCREEN_BOTTOM = 710
+SCREEN_BOTTOM = 700
 SCREEN_LEFT = -40
 SCREEN_RIGHT = 490
 
@@ -20,7 +20,7 @@ class Player:
         
         # Player's coordinates
         self.x = STARTING_X_POSITION
-        self.y = SCREEN_BOTTOM
+        self.y = SCREEN_BOTTOM - 20
 
         # Camera control - updates when landing on platform
         self.camera_y_offset = 0
