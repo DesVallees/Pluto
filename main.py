@@ -389,17 +389,11 @@ def updateBackgroundYPosition():
 
     # If the target has not been achieved...
     if not target_accomplished:
-        # Calculate moving speed relative to frame rate for smooth transition
-        MOVING_SPEED = (target + position) / NORMAL_FRAME_RATE
-
-        # Make sure that the speed when going up is not too fast
-        if target > position: MOVING_SPEED = max(MOVING_SPEED, -2)
-
-        # Determine the direction of movement 1 for up, -1 for down
-        DIRECTION = 1 if target < position else -1
+        # Calculate moving speed relative to the difference between the target and current position
+        MOVING_SPEED = -max((target + position) / NORMAL_FRAME_RATE, -2) if target > position else target + position
 
         # Update the position towards the target
-        position += MOVING_SPEED * DIRECTION
+        position += MOVING_SPEED
 
         # Ensure the background y-position does not go out of bound and update it
         DYNAMIC["background_y_position"] = max(max_offset, min(0, position))
