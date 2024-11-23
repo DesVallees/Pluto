@@ -66,7 +66,7 @@ class Enemy:
     
     # Method to update enemy's hitbox
     def updateHitbox(self):
-        TRIM_PX_TOP = 7
+        TRIM_PX_TOP = 10
 
         self.hitbox.update(self.x, self.y + TRIM_PX_TOP, self.width, self.height - TRIM_PX_TOP)
 
